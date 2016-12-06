@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='sav2csv',
-    version='1.0.0',
+    version='1.1.0',
     author='Harald von Waldow',
     author_email='harald.vonwaldow@eawag.ch',
     packages=['sav2csv'],
