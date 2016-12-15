@@ -4,10 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['sav2csv.py'],
-             pathex=['/home/vonwalha/git/sav2csv/sav2csv'],
-             binaries=[('/home/vonwalha/spss/src/savreaderwriter/savReaderWriter/spssio/lin64/*',
-                        './savReaderWriter/spssio/lin64/')],
-             binaries=None,
+             pathex=['C:/Users/vonwalha/src/sav2csv/sav2csv'],
+             binaries=[('C:/Users/vonwalha/src/sav2csv/venv/Lib/site-packages/savReaderWriter/spssio/win32/',
+                        './savReaderWriter/spssio/win32/')],
              datas=None,
              hiddenimports=[],
              hookspath=[],
