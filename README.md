@@ -1,5 +1,5 @@
 # sav2csv
-Converts SPAA ".sav" files to CSV.
+Converts SPSS ".sav" files to CSV.
 
     usage: sav2csv [-h] [-f SAV_FILE] [-o OUTPUTDIRECTORY]
 
