@@ -1,84 +1,43 @@
-from savReaderWriter import SavReader
-import os.path
-import sys
-import csv
+#!/usr/bin/env python3
 import argparse
-from Tkinter import Tk
-import tkFileDialog
+import os
+import sys
 
+import pandas as pd
+import pyreadstat
 
-class RFC4180(csv.Dialect):
-    def __init__(self):
-        csv.Dialect.__init__(self)
-    delimiter = b','
-    doublequote = True
-    escapechar = None
-    lineterminator = b'\r\n'
-    quotechar = b'"'
-    quoting = csv.QUOTE_MINIMAL
-    skipinitialspace = False
-    stric = True
+def parse_args():
+    p = argparse.ArgumentParser(
+        description="Convert SPSS .sav to CSV"
+    )
+    p.add_argument(
+        "-f", "--file", required=True,
+        help=".sav file to convert"
+    )
+    p.add_argument(
+        "-o", "--outdir", default=None,
+        help="Output directory (default: same as input file)"
+    )
+    return p.parse_args()
 
-def parseargs():
-    pa = argparse.ArgumentParser(
-        description='Converts an spss "sav" data file to CSV')
-    pa.add_argument('-f', metavar='SAV_FILE',
-                    help='The .sav file to export. ' +
-                    'If omitted, a graphical file chooser will be used.')
-    pa.add_argument('-o', metavar='OUTPUTDIRECTORY',
-                    help='The output directory. Default is the current ' +
-                    'directory if SAV_FILE was given, otherwise a ' +
-                    'file chooser will be used as well.')
-    args = pa.parse_args(sys.argv[1:])
-    return vars(args)
-
-
-def _stringify(dat):
-    if not isinstance(dat, basestring):
-        return str(dat).encode('utf-8')
-    else:
-        return dat.encode('utf-8')
-
-def convert(infile, outfile):
-    with SavReader(infile, returnHeader=True, ioUtf8=True,
-                   recodeSysmisTo='NA') as r:
-        with open(outfile, 'w') as fout:
-            for l in r:
-                l = [_stringify(c) for c in l]
-                writer = csv.writer(fout, dialect='RFC4180')
-                writer.writerow(l)
-
-def get_paths():
-    home = os.path.expanduser('~')
-    infile = parseargs()['f']
-    out_dir = parseargs()['o']
-    if infile is None:
-        root = Tk()
-        root.withdraw()
-        f = tkFileDialog.askopenfile(title='Choose file to convert',
-                                      filetypes=[('sav', '*.sav')],
-                                      initialdir=home)
-        if f:
-            infile = f.name
-            f.close()
-        else:
-            sys.exit()
-        if out_dir is None:
-            out_dir = tkFileDialog.askdirectory(title='Choose output directory',
-                                                initialdir=home)
-            if not out_dir:
-                sys.exit()
-        root.destroy()
-    if not out_dir:
-        out_dir = os.getcwd()
-    return (infile, out_dir)
+def convert(sav_path, csv_path):
+    # read both data and metadata (we just dump data)
+    df, meta = pyreadstat.read_sav(sav_path, apply_value_formats=False)
+    df.to_csv(csv_path, index=False, encoding="utf-8")
 
 def main():
-    csv.register_dialect(u'RFC4180', RFC4180)
-    infile, out_dir = get_paths()
-    outfilename = os.path.splitext(os.path.basename(infile))[0] + '.csv'
-    outfile = os.path.join(out_dir, outfilename)
-    convert(infile, outfile)
+    args = parse_args()
+    in_sav = args.file
+    out_dir = args.outdir or os.path.dirname(in_sav)
+    base = os.path.splitext(os.path.basename(in_sav))[0]
+    out_csv = os.path.join(out_dir, base + ".csv")
 
-if __name__ == '__main__':
+    try:
+        convert(in_sav, out_csv)
+        print(f"Written CSV to: {out_csv}")
+    except Exception as e:
+        print("Failed to convert:", e, file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
     main()
