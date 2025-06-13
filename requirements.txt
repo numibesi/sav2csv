@@ -1,1 +1,4 @@
-savReaderWriter>=3.4.2
+pyreadstat>=1.2.9
+pandas>=2.3.0
+python-dateutil>=2.9.0
+tzdata>=2025.
