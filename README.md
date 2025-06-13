@@ -1,4 +1,6 @@
 # sav2csv
+# UPDATED TO USE Python3 and Pandas
+
 Converts SPSS ".sav" files to CSV.
 
     usage: sav2csv [-h] [-f SAV_FILE] [-o OUTPUTDIRECTORY]
